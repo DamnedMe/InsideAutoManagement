@@ -1,0 +1,6 @@
+@InsideAutoManagement_HostAddress = http://localhost:5268
+
+GET {{InsideAutoManagement_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
