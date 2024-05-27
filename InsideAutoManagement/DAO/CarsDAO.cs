@@ -10,10 +10,12 @@ namespace InsideAutoManagement.DAO
     public class CarsDAO
     {
         private readonly InsideAutoManagementContext _context = null!;
+        private CarDealer _carDealer = null!;
 
-        public CarsDAO(InsideAutoManagementContext context)
+        public CarsDAO(InsideAutoManagementContext context, CarDealer carDealer)
         {
             _context = context;
+            _carDealer = carDealer;
         }
 
         public async Task<IEnumerable<Car>> GetCars()
@@ -21,7 +23,7 @@ namespace InsideAutoManagement.DAO
             if (_context.Cars == null || _context.Cars.Count() == 0)
                 return new List<Car>();
 
-            return await _context.Cars.ToListAsync();
+            return await _context.Cars.Where(c=>c.CarDealer == _carDealer).ToListAsync();
         }
 
         public async Task<Car?> GetCar(Guid id)
@@ -29,7 +31,7 @@ namespace InsideAutoManagement.DAO
             if (_context.Cars == null || _context.Cars.Count() == 0)
                 return null;
 
-            var car = await _context.Cars.FindAsync(id);            
+            var car = await _context.Cars.Where(c => c.CarDealer == _carDealer && c.Id == id).FirstOrDefaultAsync();
 
             return car;
         }
@@ -39,7 +41,7 @@ namespace InsideAutoManagement.DAO
             if (_context.Cars == null || _context.Cars.Count() == 0)
                 return null;
 
-            var car = await _context.Cars.Where(c=>c.Plate == plate).FirstOrDefaultAsync();
+            var car = await _context.Cars.Where(c=> c.CarDealer == _carDealer && c.Plate == plate).FirstOrDefaultAsync();
 
             return car;
         }
@@ -52,6 +54,8 @@ namespace InsideAutoManagement.DAO
 
             if (_context.Cars == null || _context.Cars.Count() == 0)
                 throw new InvalidOperationException("There are no cars");
+
+            car.CarDealer = _carDealer;
 
             if(CarExists(car.Plate) == false)
                 throw new ArgumentException($"The input car plate {car.Plate} doesn't exist");
@@ -73,6 +77,8 @@ namespace InsideAutoManagement.DAO
             {
                 if(car==null)
                     throw new ArgumentNullException();
+
+                car.CarDealer = _carDealer;
 
                 var existingCars = await GetCar(car.Plate);
 
@@ -97,7 +103,7 @@ namespace InsideAutoManagement.DAO
        
         public async Task DeleteCar(Guid id)
         {
-            var car = await _context.Cars.FindAsync(id);
+            var car = await _context.Cars.Where(c => c.CarDealer == _carDealer && c.Id == id).FirstOrDefaultAsync();
             if (car == null)
                 throw new InvalidOperationException($"there aren't cars with id = {id}");
 
@@ -107,9 +113,9 @@ namespace InsideAutoManagement.DAO
 
         public async Task DeleteCar(string plate)
         {
-            var car = await _context.Cars.Where(cd=> cd.Plate == plate).FirstAsync();
+            var car = await _context.Cars.Where(c=> c.CarDealer == _carDealer && c.Plate == plate).FirstAsync();
             if (car == null)
-                throw new InvalidOperationException($"there aren't cars with name = {plate}");
+                throw new InvalidOperationException($"there aren't cars with plate = {plate}");
 
             _context.Cars.Remove(car);
             await _context.SaveChangesAsync();
@@ -120,14 +126,14 @@ namespace InsideAutoManagement.DAO
             if (_context.Cars == null || _context.Cars.Count() == 0)
                 return false;
 
-            return _context.Cars.Any(e => e.Id == id);
+            return _context.Cars.Any(c => c.CarDealer == _carDealer && c.Id == id);
         }
         public bool CarExists(string plate)
         {
             if (_context.Cars == null || _context.Cars.Count() == 0)
                 return false;
 
-            return _context.Cars.Any(e => e.Plate == plate);
+            return _context.Cars.Any(c => c.CarDealer == _carDealer && c.Plate == plate);
         }
     }
 }

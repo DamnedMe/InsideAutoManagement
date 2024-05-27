@@ -6,6 +6,14 @@ namespace InsideAutoManagement.Model
     {
         public Guid Id { get; set; }
         
+        /// <summary>
+        /// File Name
+        /// </summary>
+        public string Name { get; set; } = null!;
+
+        /// <summary>
+        /// Id DocumentType
+        /// </summary>
         public DocumentTypeId DocumentTypeId { get; set; }
        
         /// <summary>

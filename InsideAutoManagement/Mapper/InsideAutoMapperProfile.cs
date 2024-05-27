@@ -29,7 +29,8 @@ namespace InsideAutoManagement.Mapper
 
             CreateMap<Car, CarDTO>()
                 .ReverseMap()
-                .ForMember(dest=>dest.CarDealer, opt => opt.MapFrom(src => src.CarDealer));
+                .ForMember(dest=>dest.CarDealer, opt => opt.MapFrom(src => src.CarDealer))
+                .ForMember(dest=>dest.Documents, opt => opt.MapFrom(src => src.Documents));
         }
 
         //internal IEnumerable<OpeningHoursShift>? MapOpeningHoursShifts(IEnumerable<OpeningHoursShiftDTO>? ohss)

@@ -10,6 +10,11 @@ namespace InsideAutoManagement.DTO
         public Guid Id { get; set; }
 
         /// <summary>
+        /// File Name
+        /// </summary>
+        public string Name { get; set; } = null!;
+
+        /// <summary>
         /// DocumentType: Image / Document
         /// </summary>
         public DocumentTypeId DocumentTypeId { get; set; }

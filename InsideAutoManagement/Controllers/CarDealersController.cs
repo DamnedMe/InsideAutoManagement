@@ -19,7 +19,7 @@ namespace InsideAutoManagement.Controllers
         public CarDealersController(InsideAutoManagementContext context, IMapper mapper)
         {
             _mapper = mapper;
-            _carDealersDAO = new CarDealersDAO(context, mapper);
+            _carDealersDAO = new CarDealersDAO(context);
         }
 
         // GET: api/CarDealers

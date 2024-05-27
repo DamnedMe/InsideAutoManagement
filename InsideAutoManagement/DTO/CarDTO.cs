@@ -85,6 +85,11 @@ namespace InsideAutoManagement.DTO
         public double StartPrice { get; set; }
 
         /// <summary>
+        /// Documenti e immagini
+        /// </summary>
+        public List<DocumentDTO>? Documents { get; set; }
+
+        /// <summary>
         /// Concessionario
         /// </summary>
         /// <value></value>

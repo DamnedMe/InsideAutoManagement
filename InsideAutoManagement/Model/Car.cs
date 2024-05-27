@@ -93,5 +93,10 @@ namespace InsideAutoManagement.Model
         /// </summary>
         /// <value></value>
         public CarDealer CarDealer { get; set; } = null!;
+
+        /// <summary>
+        /// Documenti e immagini
+        /// </summary>
+        public List<Document>? Documents { get; set; }
     }
 }

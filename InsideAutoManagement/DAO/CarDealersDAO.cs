@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using InsideAutoManagement.Data;
-using InsideAutoManagement.DTO;
+﻿using InsideAutoManagement.Data;
 using InsideAutoManagement.Model;
 using Microsoft.EntityFrameworkCore;
 

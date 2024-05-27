@@ -3,6 +3,7 @@ using InsideAutoManagement.DAO;
 using InsideAutoManagement.Data;
 using InsideAutoManagement.DTO;
 using InsideAutoManagement.Model;
+using InsideAutoManagement.RequestModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,17 +14,17 @@ namespace InsideAutoManagement.Controllers
     public class CarsController : ControllerBase
     {
         //private readonly InsideAutoManagementContext _context;
-        private CarsDAO _carsDAO;
-        private CarDealersDAO _carDealersDAO;
         private ConfigurationsDAO _configurationsDAO;
+        private CarsDAO _carsDAO;
+        private DocumentsDAO _documentsDAO;
         private IMapper _mapper;
 
-        public CarsController(InsideAutoManagementContext context, IMapper mapper)
+        public CarsController(InsideAutoManagementContext context, IMapper mapper, CarDealer carDealer)
         {
             _mapper = mapper;
-            _carsDAO = new CarsDAO(context);
-            _carDealersDAO = new CarDealersDAO(context);
             _configurationsDAO = new ConfigurationsDAO(context);
+            _carsDAO = new CarsDAO(context,carDealer);
+            _documentsDAO = new DocumentsDAO(context,carDealer);
         }
 
         // GET: api/Cars
@@ -76,11 +77,6 @@ namespace InsideAutoManagement.Controllers
 
             try
             {
-                CarDealerDTO? carDealer =  _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(car.CarDealer.Id));
-
-                if (carDealer != null)
-                    car.CarDealer = carDealer;
-
                 await _carsDAO.EditCar(id, _mapper.Map<Car>(car));
             }
             catch (DbUpdateConcurrencyException)
@@ -99,13 +95,6 @@ namespace InsideAutoManagement.Controllers
         [HttpPost]
         public async Task<ActionResult<CarDTO>> PostCar(CarDTO car)
         {
-            CarDealerDTO? carDealer = _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(car.CarDealer.Id));
-
-            if (carDealer != null)
-                car.CarDealer = carDealer;
-
-            
-
             await _carsDAO.SaveCar(_mapper.Map<Car>(car));
 
             return CreatedAtAction("GetCar", new { id = car.Id }, car);
@@ -136,23 +125,43 @@ namespace InsideAutoManagement.Controllers
         }
 
         [HttpPost("UploadImate/{plate}")]
-        public IActionResult UploadFile(string plate, IFormFile imageFile)
+        public async Task<IActionResult> UploadFile(string plate, Document document, IFormFile file)
         {
-            if (imageFile == null || imageFile.Length == 0)
-            {
+            if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
-            }
 
-            // Specify the path where you want to save the image
-            string filePath = Path.Combine("path/to/images", imageFile.FileName);
+            if (CarExists(plate) == false)
+                return BadRequest($"There are no car with plate {plate}");
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            using (var memoryStream = new MemoryStream())
             {
-                imageFile.CopyTo(fileStream);
+                await _documentsDAO.SaveDocuments( [ 
+                    new RequestSaveDocuments { 
+                        Document = document, 
+                        DocumentBytes = GetBytesFromMemoryStream(file)
+                    } ]);
             }
 
-            return Ok("Image uploaded successfully");
+            Car car = await _carsDAO.GetCar(plate) ?? throw new Exception("Car not found");
+           if(car.Documents == null) 
+                car.Documents = new List<Document>();
+
+            car.Documents.Add(document);
+
+            await _carsDAO.EditCar(car.Id, car);
+
+            return Ok($"Document {file.Name} uploaded successfully");
         }
+
+        private byte[] GetBytesFromMemoryStream(IFormFile file)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                file.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+
 
         private bool CarExists(Guid id)
         {
@@ -162,16 +171,6 @@ namespace InsideAutoManagement.Controllers
         {
             return _carsDAO.CarExists(plate);
         }
-
-        private string GetDocumentPath(Guid? imageId = null)
-        {
-            string path = string.Empty;
-
-            if (imageId == null)
-                path = _configurationsDAO.GetDocumentPath();
-            return path;
-        }
-
 
         
 
