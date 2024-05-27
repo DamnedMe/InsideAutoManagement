@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using InsideAutoManagement.Data;
 using InsideAutoManagement.DTO;
-using InsideAutoManagement.Models;
+using InsideAutoManagement.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace InsideAutoManagement.DAO
@@ -12,12 +12,10 @@ namespace InsideAutoManagement.DAO
     public class CarDealersDAO
     {
         private readonly InsideAutoManagementContext _context = null!;
-        private readonly IMapper _mapper;
 
-        public CarDealersDAO(InsideAutoManagementContext context, IMapper mapper)
+        public CarDealersDAO(InsideAutoManagementContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         private void DeleteOpeningHoursShifts(CarDealer existingCarDealer)
@@ -39,7 +37,7 @@ namespace InsideAutoManagement.DAO
             return carDealers;
         }
 
-        public async Task<CarDealer?> GetCarDealer(long id)
+        public async Task<CarDealer?> GetCarDealer(Guid id)
         {
             if (_context.CarDealers == null || _context.CarDealers.Count() == 0)
                 return null;
@@ -48,9 +46,6 @@ namespace InsideAutoManagement.DAO
                 .Include(cd => cd.OpeningHoursShifts)
                 .Where(cd => cd.Id == id)
                 .FirstOrDefaultAsync();
-
-            if (carDealer == null)
-                return null;
 
             return carDealer;
         }
@@ -65,25 +60,24 @@ namespace InsideAutoManagement.DAO
                .Where(cd => cd.Name == name)
                .FirstOrDefaultAsync();
 
-            if (carDealer == null)
-                return null;
-
             return carDealer;
         }
 
-        public async Task EditCarDealer(long id, CarDealer carDealer)
+        public async Task EditCarDealer(Guid id, CarDealer carDealer)
         {
 
             if (id != carDealer.Id)
                 throw new ArgumentException("Diverget id between argument");
 
-            if (CarDealerExists(id) == false)
-                throw new ArgumentException($"CarDealers with id {id} doesn't exists");
+            if (_context.CarDealers == null || _context.CarDealers.Count() == 0)
+                throw new InvalidOperationException("There are no cardealers");
 
-            _context.Entry(carDealer).State = EntityState.Modified;
+            if (CarDealerExists(carDealer.Name) == false)
+                throw new ArgumentException($"CarDealers with name {carDealer.Name} doesn't exists");
 
             try
             {
+                _context.Entry(carDealer).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             catch
@@ -130,7 +124,7 @@ namespace InsideAutoManagement.DAO
             }
         }
 
-        public async Task DeleteCarDealer(long id)
+        public async Task DeleteCarDealer(Guid id)
         {
             var carDealer = await _context.CarDealers
                 .Include(cd => cd.OpeningHoursShifts)
@@ -158,7 +152,7 @@ namespace InsideAutoManagement.DAO
             await _context.SaveChangesAsync();
         }
 
-        public bool CarDealerExists(long id)
+        public bool CarDealerExists(Guid id)
         {
             return _context.CarDealers.Any(e => e.Id == id);
         }

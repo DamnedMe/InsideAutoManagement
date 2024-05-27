@@ -2,7 +2,7 @@
 using InsideAutoManagement.DAO;
 using InsideAutoManagement.Data;
 using InsideAutoManagement.DTO;
-using InsideAutoManagement.Models;
+using InsideAutoManagement.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +44,7 @@ namespace InsideAutoManagement.Controllers
 
         // GET: api/CarDealers/GetCarDealerById/5
         [HttpGet("GetCarDealerById/{id}")]
-        public async Task<ActionResult<CarDealerDTO>> GetCarDealerById(long id)
+        public async Task<ActionResult<CarDealerDTO>> GetCarDealerById(Guid id)
         {
             var carDealerDTO = _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(id));
             if (carDealerDTO == null)
@@ -72,7 +72,7 @@ namespace InsideAutoManagement.Controllers
         // PUT: api/CarDealers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCarDealer(long id, CarDealerDTO carDealerDTO)
+        public async Task<IActionResult> PutCarDealer(Guid id, CarDealerDTO carDealerDTO)
         {
             if (id != carDealerDTO.Id)
                 return BadRequest();
@@ -109,7 +109,7 @@ namespace InsideAutoManagement.Controllers
 
         // DELETE: api/CarDealers/DeleteCarDealerById/5
         [HttpDelete("DeleteCarDealerById/{id}")]
-        public async Task<IActionResult> DeleteCarDealerById(long id)       
+        public async Task<IActionResult> DeleteCarDealerById(Guid id)       
         {            
             if (!CarDealerExists(id))
                 return NotFound();            
@@ -130,7 +130,7 @@ namespace InsideAutoManagement.Controllers
             return NoContent();
         }
 
-        private bool CarDealerExists(long id)
+        private bool CarDealerExists(Guid id)
         {
             return _carDealersDAO.CarDealerExists(id);
         }

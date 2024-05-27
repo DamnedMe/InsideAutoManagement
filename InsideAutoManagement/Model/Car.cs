@@ -1,6 +1,6 @@
 using InsideAutoManagement.Enums;
 
-namespace InsideAutoManagement.Models
+namespace InsideAutoManagement.Model
 {
     public class Car
     {
@@ -8,7 +8,7 @@ namespace InsideAutoManagement.Models
         /// Key
         /// </summary>
         /// <value></value>
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Marca

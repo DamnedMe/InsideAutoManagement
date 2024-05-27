@@ -1,4 +1,4 @@
-using InsideAutoManagement.Models;
+using InsideAutoManagement.Model;
 
 namespace InsideAutoManagement.TestData
 {
@@ -8,9 +8,9 @@ namespace InsideAutoManagement.TestData
         {
             var carDealers = new List<CarDealer>
             {
-            new CarDealer
+                new CarDealer
                 {
-                    Id = 1,
+                    Id = new Guid(),
                     Name = "InsideAuto",
                     PIVA = "12345678901",
                     Phone = "+39 377 965 2192",

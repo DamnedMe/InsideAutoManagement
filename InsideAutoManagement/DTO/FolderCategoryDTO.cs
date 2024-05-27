@@ -1,6 +1,6 @@
-namespace InsideAutoManagement.Model
+namespace InsideAutoManagement.DTO
 {
-    public class FolderCategory
+    public class FolderCategoryDTO
     {
         public Guid Id { get;set; }
 
@@ -20,6 +20,6 @@ namespace InsideAutoManagement.Model
         /// Concessionario
         /// </summary>
         /// <value></value>
-        public CarDealer CarDealer { get; set; } = null!;
+        public CarDealerDTO CarDealer { get; set; } = null!;
     }
 }

@@ -15,6 +15,12 @@ namespace InsideAutoManagement.Data.Seed
                 isChanged = true;
             }
 
+            if (context.Configurations.Any() == false)
+            {
+                context.Configurations.AddRange(DefaultConfigurationData.GetDefaultConfigurationData());
+                isChanged = true;
+            }
+
             if (isChanged)
                 context.SaveChanges();
         }

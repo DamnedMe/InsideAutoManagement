@@ -1,4 +1,4 @@
-namespace InsideAutoManagement.Models
+namespace InsideAutoManagement.Model
 {
     /// <summary>
     /// Turni apertura

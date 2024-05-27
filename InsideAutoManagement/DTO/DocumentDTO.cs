@@ -1,24 +1,30 @@
 using InsideAutoManagement.Enums;
 
-namespace InsideAutoManagement.Model
+namespace InsideAutoManagement.DTO
 {
-    public class Document
+    /// <summary>
+    /// Documentazione (foto e documenti)
+    /// </summary>
+    public record DocumentDTO
     {
         public Guid Id { get; set; }
-        
+
+        /// <summary>
+        /// DocumentType: Image / Document
+        /// </summary>
         public DocumentTypeId DocumentTypeId { get; set; }
-       
+
         /// <summary>
         /// Path immagine
         /// </summary>
         /// <value></value>
-        public string Path { get; set; }  = null!;
+        public string Path { get; set; } = null!;
 
         /// <summary>
         /// Informazioni Cartella
         /// </summary>
         /// <value></value>
-        public FolderCategory FolderCategory { get; set; } = null!;
+        public FolderCategoryDTO FolderCategory { get; set; } = null!;
 
         /// <summary>
         /// Descrizione documento
@@ -40,6 +46,6 @@ namespace InsideAutoManagement.Model
         /// Concessionario
         /// </summary>
         /// <value></value>
-        public CarDealer CarDealer { get; set; } = null!;
+        public CarDealerDTO CarDealer { get; set; } = null!;       
     }
 }

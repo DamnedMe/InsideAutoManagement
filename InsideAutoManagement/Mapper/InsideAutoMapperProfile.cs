@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using InsideAutoManagement.DTO;
-using InsideAutoManagement.Models;
+using InsideAutoManagement.Model;
 using Microsoft.IdentityModel.Tokens;
 
 namespace InsideAutoManagement.Mapper
@@ -17,6 +17,15 @@ namespace InsideAutoManagement.Mapper
             CreateMap<CarDealer, CarDealerDTO>()
                 .ReverseMap()
                 .ForMember(dest => dest.OpeningHoursShifts, opt => opt.MapFrom(src => src.OpeningHoursShifts));
+
+            CreateMap<FolderCategory, FolderCategoryDTO>()
+              .ReverseMap()
+              .ForMember(dest => dest.CarDealer, opt => opt.MapFrom(src => src.CarDealer));
+
+            CreateMap<Document, DocumentDTO>()
+                .ReverseMap()
+                .ForMember(dest => dest.CarDealer, opt => opt.MapFrom(src => src.CarDealer))
+                .ForMember(dest => dest.FolderCategory, opt => opt.MapFrom(src => src.FolderCategory));
 
             CreateMap<Car, CarDTO>()
                 .ReverseMap()

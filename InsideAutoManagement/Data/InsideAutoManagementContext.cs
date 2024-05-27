@@ -1,6 +1,5 @@
 ﻿using InsideAutoManagement.Data.Seed;
-using InsideAutoManagement.Models;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
+using InsideAutoManagement.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace InsideAutoManagement.Data
@@ -25,6 +24,8 @@ namespace InsideAutoManagement.Data
         {
             //Seeding.Initialize(this);
         }
+
+        public DbSet<Configuration> Configurations { get; set; }
 
         public DbSet<Car> Cars { get; set; }
 

@@ -2,7 +2,7 @@
 {
     public record CarDealerDTO
     {
-        public long Id { get; set; } = 0;
+        public Guid Id { get; set; } = new Guid();
 
         /// <summary>
         /// Nome concessionario

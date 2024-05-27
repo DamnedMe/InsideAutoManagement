@@ -2,7 +2,7 @@
 using InsideAutoManagement.DAO;
 using InsideAutoManagement.Data;
 using InsideAutoManagement.DTO;
-using InsideAutoManagement.Models;
+using InsideAutoManagement.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,20 +15,23 @@ namespace InsideAutoManagement.Controllers
         //private readonly InsideAutoManagementContext _context;
         private CarsDAO _carsDAO;
         private CarDealersDAO _carDealersDAO;
+        private ConfigurationsDAO _configurationsDAO;
         private IMapper _mapper;
 
         public CarsController(InsideAutoManagementContext context, IMapper mapper)
         {
             _mapper = mapper;
             _carsDAO = new CarsDAO(context);
-            _carDealersDAO = new CarDealersDAO(context, mapper);
+            _carDealersDAO = new CarDealersDAO(context);
+            _configurationsDAO = new ConfigurationsDAO(context);
         }
 
         // GET: api/Cars
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Car>>> GetCar()
+        public async Task<ActionResult<IEnumerable<CarDTO>>> GetCar()
         {
-            IEnumerable<Car> cars = await _carsDAO.GetCars();
+            IEnumerable<CarDTO> cars = (await _carsDAO.GetCars())
+                 .Select(c => _mapper.Map<CarDTO>(c!));
 
             if (cars == null)
                 return NoContent();
@@ -37,9 +40,9 @@ namespace InsideAutoManagement.Controllers
 
         // GET: api/Cars/5
         [HttpGet("GetCarById/{id}")]
-        public async Task<ActionResult<Car>> GetCarById(long id)
+        public async Task<ActionResult<CarDTO>> GetCarById(Guid id)
         {
-            var car = await _carsDAO.GetCar(id);
+            var car = _mapper.Map<CarDTO>(await _carsDAO.GetCar(id));
 
             if (car == null)
             {
@@ -53,7 +56,7 @@ namespace InsideAutoManagement.Controllers
         [HttpGet("{plate}")]
         public async Task<ActionResult<Car>> GetCar(string plate)
         {
-            var car = await _carsDAO.GetCar(plate);
+            var car = _mapper.Map<CarDTO>(await _carsDAO.GetCar(plate));
 
             if (car == null)
             {
@@ -66,19 +69,19 @@ namespace InsideAutoManagement.Controllers
         // PUT: api/Cars/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCar(long id, Car car)
+        public async Task<IActionResult> PutCar(Guid id, CarDTO car)
         {
             if (id != car.Id)
                 return BadRequest();
 
             try
             {
-                CarDealer? carDealer = await _carDealersDAO.GetCarDealer(car.CarDealer.Id);
+                CarDealerDTO? carDealer =  _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(car.CarDealer.Id));
 
                 if (carDealer != null)
                     car.CarDealer = carDealer;
 
-                await _carsDAO.EditCar(id, car);
+                await _carsDAO.EditCar(id, _mapper.Map<Car>(car));
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -94,21 +97,23 @@ namespace InsideAutoManagement.Controllers
         // POST: api/Cars
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Car>> PostCar(Car car)
+        public async Task<ActionResult<CarDTO>> PostCar(CarDTO car)
         {
-            CarDealer? carDealer = await _carDealersDAO.GetCarDealer(car.CarDealer.Id);
+            CarDealerDTO? carDealer = _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(car.CarDealer.Id));
 
             if (carDealer != null)
                 car.CarDealer = carDealer;
 
-            await _carsDAO.SaveCar(car);
+            
+
+            await _carsDAO.SaveCar(_mapper.Map<Car>(car));
 
             return CreatedAtAction("GetCar", new { id = car.Id }, car);
         }
 
         // DELETE: api/Cars/DeleteCarById/5
         [HttpDelete("DeleteCarById/{id}")]
-        public async Task<IActionResult> DeleteCarById(long id)       
+        public async Task<IActionResult> DeleteCarById(Guid id)       
         {            
             if (!CarExists(id))
                 return NotFound();
@@ -130,7 +135,26 @@ namespace InsideAutoManagement.Controllers
             return NoContent();
         }
 
-        private bool CarExists(long id)
+        [HttpPost("UploadImate/{plate}")]
+        public IActionResult UploadFile(string plate, IFormFile imageFile)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                return BadRequest("No file uploaded");
+            }
+
+            // Specify the path where you want to save the image
+            string filePath = Path.Combine("path/to/images", imageFile.FileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                imageFile.CopyTo(fileStream);
+            }
+
+            return Ok("Image uploaded successfully");
+        }
+
+        private bool CarExists(Guid id)
         {
             return _carsDAO.CarExists(id);
         }
@@ -138,5 +162,18 @@ namespace InsideAutoManagement.Controllers
         {
             return _carsDAO.CarExists(plate);
         }
+
+        private string GetDocumentPath(Guid? imageId = null)
+        {
+            string path = string.Empty;
+
+            if (imageId == null)
+                path = _configurationsDAO.GetDocumentPath();
+            return path;
+        }
+
+
+        
+
     }
 }

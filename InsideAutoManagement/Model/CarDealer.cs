@@ -1,8 +1,8 @@
-namespace InsideAutoManagement.Models
+namespace InsideAutoManagement.Model
 {
     public class CarDealer
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Nome concessionario
@@ -51,5 +51,11 @@ namespace InsideAutoManagement.Models
         /// </summary>
         /// <value></value>
         public List<OpeningHoursShift>? OpeningHoursShifts { get;set; }
+
+        /// <summary>
+        /// Documentazione
+        /// </summary>
+        /// <value></value>
+        public List<Document>? Documents { get; set; }
     }
 }

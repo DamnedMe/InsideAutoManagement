@@ -1,5 +1,5 @@
 ﻿using InsideAutoManagement.Data;
-using InsideAutoManagement.Models;
+using InsideAutoManagement.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace InsideAutoManagement.DAO
@@ -18,11 +18,17 @@ namespace InsideAutoManagement.DAO
 
         public async Task<IEnumerable<Car>> GetCars()
         {
+            if (_context.Cars == null || _context.Cars.Count() == 0)
+                return new List<Car>();
+
             return await _context.Cars.ToListAsync();
         }
 
-        public async Task<Car?> GetCar(long id)
+        public async Task<Car?> GetCar(Guid id)
         {
+            if (_context.Cars == null || _context.Cars.Count() == 0)
+                return null;
+
             var car = await _context.Cars.FindAsync(id);            
 
             return car;
@@ -30,21 +36,29 @@ namespace InsideAutoManagement.DAO
 
         public async Task<Car?> GetCar(string plate)
         {
+            if (_context.Cars == null || _context.Cars.Count() == 0)
+                return null;
+
             var car = await _context.Cars.Where(c=>c.Plate == plate).FirstOrDefaultAsync();
 
             return car;
         }
 
-        public async Task EditCar(long id, Car car)
+        public async Task EditCar(Guid id, Car car)
         {
 
             if (id != car.Id)
-                throw new ArgumentException();
+                throw new ArgumentException("Invalid car");
 
-            _context.Entry(car).State = EntityState.Modified;
+            if (_context.Cars == null || _context.Cars.Count() == 0)
+                throw new InvalidOperationException("There are no cars");
+
+            if(CarExists(car.Plate) == false)
+                throw new ArgumentException($"The input car plate {car.Plate} doesn't exist");
 
             try
             {
+                _context.Entry(car).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
             }
             catch
@@ -64,7 +78,7 @@ namespace InsideAutoManagement.DAO
 
                 if (existingCars != null)
                 {
-                    long lastId = existingCars.Id;
+                    Guid lastId = existingCars.Id;
                     existingCars = car;
                     existingCars.Id = lastId;
 
@@ -81,7 +95,7 @@ namespace InsideAutoManagement.DAO
             }           
         }
        
-        public async Task DeleteCar(long id)
+        public async Task DeleteCar(Guid id)
         {
             var car = await _context.Cars.FindAsync(id);
             if (car == null)
@@ -101,12 +115,18 @@ namespace InsideAutoManagement.DAO
             await _context.SaveChangesAsync();
         }
 
-        public bool CarExists(long id)
+        public bool CarExists(Guid id)
         {
+            if (_context.Cars == null || _context.Cars.Count() == 0)
+                return false;
+
             return _context.Cars.Any(e => e.Id == id);
         }
         public bool CarExists(string plate)
         {
+            if (_context.Cars == null || _context.Cars.Count() == 0)
+                return false;
+
             return _context.Cars.Any(e => e.Plate == plate);
         }
     }

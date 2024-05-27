@@ -4,7 +4,7 @@ namespace InsideAutoManagement.DTO
 {
     public record CarDTO
     {
-        public long Id { get; set; } = 0;
+        public Guid Id { get; set; } = new Guid();
 
         /// <summary>
         /// Marca
