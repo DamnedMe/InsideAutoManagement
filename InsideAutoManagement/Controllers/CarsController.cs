@@ -23,48 +23,70 @@ namespace InsideAutoManagement.Controllers
         {
             _mapper = mapper;
             _configurationsDAO = new ConfigurationsDAO(context);
-            _carsDAO = new CarsDAO(context,carDealer);
-            _documentsDAO = new DocumentsDAO(context,carDealer);
+
+            _carsDAO = new CarsDAO(context, carDealer);
+            _documentsDAO = new DocumentsDAO(context, carDealer);
         }
 
         // GET: api/Cars
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CarDTO>>> GetCar()
+        public async Task<ActionResult<IEnumerable<CarDTO>>> GetCars()
         {
-            IEnumerable<CarDTO> cars = (await _carsDAO.GetCars())
-                 .Select(c => _mapper.Map<CarDTO>(c!));
+            try
+            {
+                IEnumerable<CarDTO> cars = (await _carsDAO.GetCars())
+                     .Select(c => _mapper.Map<CarDTO>(c!));
 
-            if (cars == null)
-                return NoContent();
-            return Ok(cars);
+                if (cars == null)
+                    return NoContent();
+                return Ok(cars);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // GET: api/Cars/5
         [HttpGet("GetCarById/{id}")]
         public async Task<ActionResult<CarDTO>> GetCarById(Guid id)
         {
-            var car = _mapper.Map<CarDTO>(await _carsDAO.GetCar(id));
-
-            if (car == null)
+            try
             {
-                return NotFound();
-            }
+                var car = _mapper.Map<CarDTO>(await _carsDAO.GetCar(id));
 
-            return Ok(car);
+                if (car == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(car);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // GET: api/Cars/AA123BB
         [HttpGet("{plate}")]
         public async Task<ActionResult<Car>> GetCar(string plate)
         {
-            var car = _mapper.Map<CarDTO>(await _carsDAO.GetCar(plate));
-
-            if (car == null)
+            try
             {
-                return NotFound();
-            }
+                var car = _mapper.Map<CarDTO>(await _carsDAO.GetCar(plate));
 
-            return Ok(car);
+                if (car == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(car);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // PUT: api/Cars/5
@@ -72,22 +94,29 @@ namespace InsideAutoManagement.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCar(Guid id, CarDTO car)
         {
-            if (id != car.Id)
-                return BadRequest();
-
             try
             {
-                await _carsDAO.EditCar(id, _mapper.Map<Car>(car));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CarExists(id))
-                    return NotFound();
-                else
-                    throw;
-            }
+                if (id != car.Id)
+                    return BadRequest();
 
-            return NoContent();
+                try
+                {
+                    await _carsDAO.EditCar(id, _mapper.Map<Car>(car));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CarExists(id))
+                        return NotFound();
+                    else
+                        throw;
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // POST: api/Cars
@@ -95,62 +124,90 @@ namespace InsideAutoManagement.Controllers
         [HttpPost]
         public async Task<ActionResult<CarDTO>> PostCar(CarDTO car)
         {
-            await _carsDAO.SaveCar(_mapper.Map<Car>(car));
+            try
+            {
+                await _carsDAO.SaveCar(_mapper.Map<Car>(car));
 
-            return CreatedAtAction("GetCar", new { id = car.Id }, car);
+                return CreatedAtAction("GetCar", new { id = car.Id }, car);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // DELETE: api/Cars/DeleteCarById/5
         [HttpDelete("DeleteCarById/{id}")]
-        public async Task<IActionResult> DeleteCarById(Guid id)       
-        {            
-            if (!CarExists(id))
-                return NotFound();
+        public async Task<IActionResult> DeleteCarById(Guid id)
+        {
+            try
+            {
+                if (!CarExists(id))
+                    return NotFound();
 
-            await _carsDAO.DeleteCar(id);
+                await _carsDAO.DeleteCar(id);
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // DELETE: api/Cars/AA123BB
         [HttpDelete("{plate}")]
         public async Task<IActionResult> DeleteCar(string plate)
         {
-            if (!CarExists(plate))
-                return NotFound();
+            try
+            {
+                if (!CarExists(plate))
+                    return NotFound();
 
-            await _carsDAO.DeleteCar(plate);
+                await _carsDAO.DeleteCar(plate);
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
-        [HttpPost("UploadImate/{plate}")]
-        public async Task<IActionResult> UploadFile(string plate, Document document, IFormFile file)
+        [HttpPost("UploadFile/{plate}")]
+        public async Task<IActionResult> UploadFile([FromRoute] string plate, [FromQuery] Document document, IFormFile file)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded");
-
-            if (CarExists(plate) == false)
-                return BadRequest($"There are no car with plate {plate}");
-
-            using (var memoryStream = new MemoryStream())
+            try
             {
-                await _documentsDAO.SaveDocuments( [ 
-                    new RequestSaveDocuments { 
-                        Document = document, 
+                if (file == null || file.Length == 0)
+                    return BadRequest("No file uploaded");
+
+                if (CarExists(plate) == false)
+                    return BadRequest($"There are no car with plate {plate}");
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    await _documentsDAO.SaveDocuments([
+                        new RequestSaveDocuments {
+                        Document = document,
                         DocumentBytes = GetBytesFromMemoryStream(file)
                     } ]);
+                }
+
+                Car car = await _carsDAO.GetCar(plate) ?? throw new Exception("Car not found");
+                if (car.Documents == null)
+                    car.Documents = new List<Document>();
+
+                car.Documents.Add(document);
+
+                await _carsDAO.EditCar(car.Id, car);
+
+                return Ok($"Document {file.Name} uploaded successfully");
             }
-
-            Car car = await _carsDAO.GetCar(plate) ?? throw new Exception("Car not found");
-           if(car.Documents == null) 
-                car.Documents = new List<Document>();
-
-            car.Documents.Add(document);
-
-            await _carsDAO.EditCar(car.Id, car);
-
-            return Ok($"Document {file.Name} uploaded successfully");
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         private byte[] GetBytesFromMemoryStream(IFormFile file)
@@ -172,7 +229,7 @@ namespace InsideAutoManagement.Controllers
             return _carsDAO.CarExists(plate);
         }
 
-        
+
 
     }
 }

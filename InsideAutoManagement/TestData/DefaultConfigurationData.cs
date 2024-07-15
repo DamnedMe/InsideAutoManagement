@@ -5,14 +5,14 @@ namespace InsideAutoManagement.TestData
 {
     public static class DefaultConfigurationData
     {
-        public static List<Configuration> GetDefaultConfigurationData()
+        public static List<Configuration> GetDefaultConfigurationData(CarDealer defaultCarDealer)
         {
             var configurations = new List<Configuration>
             {
                 new Configuration
                 {
                     Name = "DefaultPath",
-                    CarDealer = CarDealersData.GetCarDealersData().FirstOrDefault(),
+                    CarDealer = defaultCarDealer,
                     ValueType = ConfigurationValueType.String,
                     StringValue = @"C:\InsideAutoManagement\temp"
                 }

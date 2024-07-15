@@ -51,6 +51,11 @@
         /// </summary>
         /// <value></value>
         public List<OpeningHoursShiftDTO>? OpeningHoursShifts { get; set; }
+        /// <summary>
+        /// Documentazione
+        /// </summary>
+        /// <value></value>
+        public List<DocumentDTO>? Documents { get; set; }
 
     }
 }

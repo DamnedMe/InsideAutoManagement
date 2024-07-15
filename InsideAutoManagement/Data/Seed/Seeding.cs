@@ -9,15 +9,17 @@ namespace InsideAutoManagement.Data.Seed
             bool isChanged = false;
             context.Database.EnsureCreated();
 
+            var carDealer = CarDealersData.GetCarDealersData();
+
             if (context.CarDealers.Any() == false)
             {
-                context.CarDealers.AddRange(CarDealersData.GetCarDealersData());
+                context.CarDealers.AddRange(carDealer);
                 isChanged = true;
             }
 
             if (context.Configurations.Any() == false)
             {
-                context.Configurations.AddRange(DefaultConfigurationData.GetDefaultConfigurationData());
+                context.Configurations.AddRange(DefaultConfigurationData.GetDefaultConfigurationData(context.CarDealers.FirstOrDefault() ?? carDealer.First()));
                 isChanged = true;
             }
 

@@ -5,7 +5,7 @@ namespace InsideAutoManagement.DTO
     /// </summary>
     public record OpeningHoursShiftDTO
     {
-        public Guid Id { get;set; }
+        public long Id { get;set; }
 
         /// <summary>
         /// Giorno della settimana

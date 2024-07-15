@@ -16,7 +16,8 @@ namespace InsideAutoManagement.Mapper
 
             CreateMap<CarDealer, CarDealerDTO>()
                 .ReverseMap()
-                .ForMember(dest => dest.OpeningHoursShifts, opt => opt.MapFrom(src => src.OpeningHoursShifts));
+                .ForMember(dest => dest.OpeningHoursShifts, opt => opt.MapFrom(src => src.OpeningHoursShifts))
+                .ForMember(dest => dest.Documents, opt => opt.MapFrom(src => src.Documents));
 
             CreateMap<FolderCategory, FolderCategoryDTO>()
               .ReverseMap()
@@ -29,7 +30,7 @@ namespace InsideAutoManagement.Mapper
 
             CreateMap<Car, CarDTO>()
                 .ReverseMap()
-                .ForMember(dest=>dest.CarDealer, opt => opt.MapFrom(src => src.CarDealer))
+                //.ForMember(dest=>dest.CarDealer, opt => opt.MapFrom(src => src.CarDealer))
                 .ForMember(dest=>dest.Documents, opt => opt.MapFrom(src => src.Documents));
         }
 

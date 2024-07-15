@@ -88,11 +88,5 @@ namespace InsideAutoManagement.DTO
         /// Documenti e immagini
         /// </summary>
         public List<DocumentDTO>? Documents { get; set; }
-
-        /// <summary>
-        /// Concessionario
-        /// </summary>
-        /// <value></value>
-        public CarDealerDTO CarDealer { get; set; } = null!;
     }
 }

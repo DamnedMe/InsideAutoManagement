@@ -22,9 +22,9 @@ namespace InsideAutoManagement.Controllers
             _carDealersDAO = new CarDealersDAO(context);
         }
 
-        // GET: api/CarDealers
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CarDealerDTO>>> GetCarDealer()
+        public async Task<ActionResult<IEnumerable<CarDealerDTO>>> GetCarDealers()
         {
             try
             {
@@ -35,38 +35,53 @@ namespace InsideAutoManagement.Controllers
                     return NoContent();
 
                 return Ok(carDealers);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
-            
+
         }
 
         // GET: api/CarDealers/GetCarDealerById/5
         [HttpGet("GetCarDealerById/{id}")]
         public async Task<ActionResult<CarDealerDTO>> GetCarDealerById(Guid id)
         {
-            var carDealerDTO = _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(id));
-            if (carDealerDTO == null)
+            try
             {
-                return NotFound();
-            }
+                var carDealerDTO = _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(id));
+                if (carDealerDTO == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(carDealerDTO);
+                return Ok(carDealerDTO);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // GET: api/CarDealers/pippo
         [HttpGet("{name}")]
         public async Task<ActionResult<CarDealerDTO>> GetCarDealer(string name)
         {
-            var carDealerDTO = _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(name));
-
-            if (carDealerDTO == null)
+            try
             {
-                return NotFound();
-            }
+                var carDealerDTO = _mapper.Map<CarDealerDTO>(await _carDealersDAO.GetCarDealer(name));
 
-            return Ok(carDealerDTO);
+                if (carDealerDTO == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(carDealerDTO);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // PUT: api/CarDealers/5
@@ -100,7 +115,8 @@ namespace InsideAutoManagement.Controllers
             try
             {
                 await _carDealersDAO.SaveCarDealer(_mapper.Map<CarDealer>(carDealer));
-            }catch(DbUpdateConcurrencyException)
+            }
+            catch (DbUpdateConcurrencyException)
             {
                 return StatusCode(500);
             }
@@ -109,29 +125,44 @@ namespace InsideAutoManagement.Controllers
 
         // DELETE: api/CarDealers/DeleteCarDealerById/5
         [HttpDelete("DeleteCarDealerById/{id}")]
-        public async Task<IActionResult> DeleteCarDealerById(Guid id)       
-        {            
-            if (!CarDealerExists(id))
-                return NotFound();            
-            await _carDealersDAO.DeleteCarDealer(id);
+        public async Task<IActionResult> DeleteCarDealerById(Guid id)
+        {
+            try
+            {
+                if (!CarDealerExists(id))
+                    return NotFound();
+                await _carDealersDAO.DeleteCarDealer(id);
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // DELETE: api/CarDealers/pippo
         [HttpDelete("{name}")]
         public async Task<IActionResult> DeleteCarDealer(string name)
         {
-            if (!CarDealerExists(name))
-                return NotFound();
+            try
+            {
+                if (!CarDealerExists(name))
+                    return NotFound();
 
-            await _carDealersDAO.DeleteCarDealer(name);
+                await _carDealersDAO.DeleteCarDealer(name);
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         private bool CarDealerExists(Guid id)
         {
+
             return _carDealersDAO.CarDealerExists(id);
         }
         private bool CarDealerExists(string name)

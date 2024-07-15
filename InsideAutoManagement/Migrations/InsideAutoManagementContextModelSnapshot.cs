@@ -17,18 +17,16 @@ namespace InsideAutoManagement.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0-preview.3.24172.4")
+                .HasAnnotation("ProductVersion", "9.0.0-preview.4.24267.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("InsideAutoManagement.Models.Car", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.Car", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("BrandId")
                         .HasColumnType("int");
@@ -36,8 +34,8 @@ namespace InsideAutoManagement.Migrations
                     b.Property<long>("Capacity")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("CarDealerId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("CarDealerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -82,13 +80,11 @@ namespace InsideAutoManagement.Migrations
                     b.ToTable("Cars");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.CarDealer", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.CarDealer", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Adress")
                         .HasColumnType("nvarchar(max)");
@@ -118,16 +114,52 @@ namespace InsideAutoManagement.Migrations
                     b.ToTable("CarDealers");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.Document", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.Configuration", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    b.Property<bool?>("BoolValue")
+                        .HasColumnType("bit");
 
-                    b.Property<long>("CarDealerId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("CarDealerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DateTimeValue")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("NumberValue")
+                        .HasColumnType("float");
+
+                    b.Property<string>("StringValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ValueType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarDealerId");
+
+                    b.ToTable("Configurations");
+                });
+
+            modelBuilder.Entity("InsideAutoManagement.Model.Document", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CarDealerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CarId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -135,32 +167,42 @@ namespace InsideAutoManagement.Migrations
                     b.Property<int>("DocumentTypeId")
                         .HasColumnType("int");
 
-                    b.Property<long>("FolderCategoryId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("FolderCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("LastUpdate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Ranking")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CarDealerId");
+
+                    b.HasIndex("CarId");
 
                     b.HasIndex("FolderCategoryId");
 
                     b.ToTable("Documents");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.FolderCategory", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.FolderCategory", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("CarDealerId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("CarDealerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -176,7 +218,7 @@ namespace InsideAutoManagement.Migrations
                     b.ToTable("FolderCategories");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.OpeningHoursShift", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.OpeningHoursShift", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -184,8 +226,8 @@ namespace InsideAutoManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("CarDealerId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("CarDealerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
@@ -203,9 +245,9 @@ namespace InsideAutoManagement.Migrations
                     b.ToTable("OpeningHoursShifts");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.Car", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.Car", b =>
                 {
-                    b.HasOne("InsideAutoManagement.Models.CarDealer", "CarDealer")
+                    b.HasOne("InsideAutoManagement.Model.CarDealer", "CarDealer")
                         .WithMany()
                         .HasForeignKey("CarDealerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -214,15 +256,28 @@ namespace InsideAutoManagement.Migrations
                     b.Navigation("CarDealer");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.Document", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.Configuration", b =>
                 {
-                    b.HasOne("InsideAutoManagement.Models.CarDealer", "CarDealer")
+                    b.HasOne("InsideAutoManagement.Model.CarDealer", "CarDealer")
                         .WithMany()
+                        .HasForeignKey("CarDealerId");
+
+                    b.Navigation("CarDealer");
+                });
+
+            modelBuilder.Entity("InsideAutoManagement.Model.Document", b =>
+                {
+                    b.HasOne("InsideAutoManagement.Model.CarDealer", "CarDealer")
+                        .WithMany("Documents")
                         .HasForeignKey("CarDealerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InsideAutoManagement.Models.FolderCategory", "FolderCategory")
+                    b.HasOne("InsideAutoManagement.Model.Car", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("CarId");
+
+                    b.HasOne("InsideAutoManagement.Model.FolderCategory", "FolderCategory")
                         .WithMany()
                         .HasForeignKey("FolderCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -233,9 +288,9 @@ namespace InsideAutoManagement.Migrations
                     b.Navigation("FolderCategory");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.FolderCategory", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.FolderCategory", b =>
                 {
-                    b.HasOne("InsideAutoManagement.Models.CarDealer", "CarDealer")
+                    b.HasOne("InsideAutoManagement.Model.CarDealer", "CarDealer")
                         .WithMany()
                         .HasForeignKey("CarDealerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -244,15 +299,22 @@ namespace InsideAutoManagement.Migrations
                     b.Navigation("CarDealer");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.OpeningHoursShift", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.OpeningHoursShift", b =>
                 {
-                    b.HasOne("InsideAutoManagement.Models.CarDealer", null)
+                    b.HasOne("InsideAutoManagement.Model.CarDealer", null)
                         .WithMany("OpeningHoursShifts")
                         .HasForeignKey("CarDealerId");
                 });
 
-            modelBuilder.Entity("InsideAutoManagement.Models.CarDealer", b =>
+            modelBuilder.Entity("InsideAutoManagement.Model.Car", b =>
                 {
+                    b.Navigation("Documents");
+                });
+
+            modelBuilder.Entity("InsideAutoManagement.Model.CarDealer", b =>
+                {
+                    b.Navigation("Documents");
+
                     b.Navigation("OpeningHoursShifts");
                 });
 #pragma warning restore 612, 618
